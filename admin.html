@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal — DMRC Metro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        :root {
+            --primary: #1a3a6b;
+            --primary-light: #2655a3;
+            --accent: #e63946;
+            --bg: #f0f4f8;
+            --bg-white: #ffffff;
+            --text: #1a2236;
+            --text-muted: #5a6a80;
+            --border: #d6e0ee;
+            --shadow: rgba(26,58,107,0.12);
+            --success: #22863a;
+            --success-bg: #dcfce7;
+            --error: #9b1c1c;
+            --error-bg: #fee2e2;
+            --info: #1e40af;
+            --info-bg: #dbeafe;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 24px 16px;
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        .header { text-align: center; margin-bottom: 32px; }
+        .logo-row { display: flex; align-items: center; justify-content: center; gap: 14px; }
+        .logo-text { font-family: 'Rajdhani', sans-serif; font-size: 2.4rem; font-weight: 700; color: var(--primary); }
+        .admin-badge { background: var(--accent); color: #fff; padding: 4px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 700; letter-spacing: 1px; }
+        .tagline { font-size: 0.95rem; color: var(--text-muted); margin-top: 6px; }
+
+        .card { background: var(--bg-white); border-radius: 18px; padding: 32px; box-shadow: 0 6px 24px var(--shadow); margin-bottom: 20px; }
+
+        .form-group { margin-bottom: 18px; }
+        label { display: block; margin-bottom: 7px; font-weight: 600; font-size: 0.92rem; }
+        input, select {
+            width: 100%; padding: 11px 15px;
+            background: var(--bg); border: 2px solid var(--border);
+            border-radius: 9px; color: var(--text);
+            font-size: 0.97rem; font-family: 'DM Sans', sans-serif;
+            transition: border-color 0.2s;
+        }
+        input:focus, select:focus { outline: none; border-color: var(--primary); background: var(--bg-white); }
+
+        .btn {
+            padding: 12px 28px;
+            background: var(--primary); border: none; border-radius: 9px;
+            color: #fff; font-size: 0.97rem; font-family: 'DM Sans', sans-serif;
+            font-weight: 700; cursor: pointer; width: 100%; transition: all 0.2s;
+        }
+        .btn:hover { background: var(--primary-light); transform: translateY(-1px); }
+        .btn-ghost { background: var(--bg); color: var(--text); border: 2px solid var(--border); width: auto; padding: 9px 20px; }
+        .btn-ghost:hover { background: var(--border); transform: none; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: var(--bg); border: 2px solid var(--border); border-radius: 12px; padding: 22px; text-align: center; }
+        .stat-val { font-family: 'Rajdhani', sans-serif; font-size: 2rem; font-weight: 700; color: var(--primary); margin-bottom: 5px; }
+        .stat-lbl { font-size: 0.82rem; color: var(--text-muted); font-weight: 600; }
+
+        .ticket-item {
+            padding: 15px 18px;
+            margin-bottom: 10px;
+            background: var(--bg);
+            border-left: 4px solid var(--primary);
+            border-radius: 9px;
+        }
+        .ticket-item-route { font-weight: 700; margin-bottom: 5px; font-size: 0.97rem; }
+        .ticket-item-meta { font-size: 0.87rem; color: var(--text-muted); }
+
+        .alert {
+            padding: 13px 18px; border-radius: 9px; margin-bottom: 16px;
+            border-left: 4px solid; font-size: 0.93rem;
+        }
+        .alert-success { background: var(--success-bg); border-color: #22c55e; color: var(--success); }
+        .alert-error   { background: var(--error-bg);   border-color: #ef4444; color: var(--error); }
+        .alert-info    { background: var(--info-bg);    border-color: #3b82f6; color: var(--info); }
+
+        .back-link { text-align:center; margin-top:18px; padding-top:18px; border-top:1px solid var(--border); }
+        .back-link a { color: var(--primary); text-decoration: none; font-weight: 600; }
+        .back-link a:hover { text-decoration: underline; }
+
+        .top-bar { display:flex; justify-content:space-between; align-items:center; }
+        .section-title { font-family: 'Rajdhani', sans-serif; font-size: 1.4rem; font-weight: 700; margin-bottom: 18px; }
+
+        .filter-row { display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+        .filter-row label { margin-bottom:0; white-space:nowrap; }
+        .filter-row select { width: auto; }
+
+        .hidden { display: none !important; }
+        .loading { text-align:center; padding:30px; color:var(--text-muted); font-weight:600; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="header">
+        <div class="logo-row">
+            <h1 class="logo-text">DMRC Metro</h1>
+            <span class="admin-badge">ADMIN</span>
+        </div>
+        <p class="tagline">Administrator Portal</p>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="loginSection" class="card">
+        <h2 style="margin-bottom:20px;">🔒 Admin Login</h2>
+        <form onsubmit="handleAdminLogin(event)">
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="tel" id="adminPhone" value="9999999999" required maxlength="10">
+            </div>
+            <div class="form-group">
+                <label>Date of Birth</label>
+                <input type="date" id="adminDOB" value="2000-01-01" required>
+            </div>
+            <button type="submit" class="btn">Login as Admin</button>
+        </form>
+        <div class="back-link"><a href="index.html">← Back to User Login</a></div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboardSection" class="hidden">
+
+        <!-- Top Bar -->
+        <div class="card" style="padding:20px 28px;">
+            <div class="top-bar">
+                <div>
+                    <span class="logo-text" style="font-size:1.5rem;">👨‍💼 Admin Dashboard</span>
+                </div>
+                <button class="btn btn-ghost" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="card">
+            <div class="section-title">📊 Revenue Statistics</div>
+            <div class="stats-grid" id="adminStats">
+                <div class="loading">Loading stats…</div>
+            </div>
+        </div>
+
+        <!-- Tickets -->
+        <div class="card">
+            <div class="section-title">🎫 Recent Tickets</div>
+            <div class="filter-row">
+                <label>Show:</label>
+                <select id="ticketLimit" onchange="loadAdminTickets()">
+                    <option value="5">Last 5</option>
+                    <option value="10" selected>Last 10</option>
+                    <option value="50">Last 50</option>
+                    <option value="100">Last 100</option>
+                </select>
+            </div>
+            <div id="adminTickets"><div class="loading">Loading tickets…</div></div>
+        </div>
+
+        <!-- Top Routes -->
+        <div class="card">
+            <div class="section-title">🗺️ Top Routes</div>
+            <div id="topRoutes"><div class="loading">Loading…</div></div>
+        </div>
+
+        <!-- Top Travelers -->
+        <div class="card">
+            <div class="section-title">🏆 Top Travelers</div>
+            <div id="topTravelers"><div class="loading">Loading…</div></div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+const API = 'http://localhost:3000/api';
+let currentAdmin = null;
+
+// ── ALERTS ───────────────────────────────────────────
+function showAlert(msg, type = 'info') {
+    const el = document.createElement('div');
+    el.className = `alert alert-${type}`;
+    el.textContent = msg;
+    const first = document.querySelector('.card');
+    first.insertBefore(el, first.firstChild);
+    setTimeout(() => el.remove(), 5000);
+}
+
+// ── LOGIN ─────────────────────────────────────────────
+async function handleAdminLogin(e) {
+    e.preventDefault();
+    const phone = document.getElementById('adminPhone').value.trim();
+    const dob   = document.getElementById('adminDOB').value;
+    try {
+        const r = await fetch(`${API}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone, dob })
+        });
+        const d = await r.json();
+        if (d.success) {
+            if (d.data.user_type !== 'admin') {
+                showAlert('Only admin users can access this portal', 'error'); return;
+            }
+            currentAdmin = d.data;
+            showAlert('Admin login successful! 🎉', 'success');
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('dashboardSection').classList.remove('hidden');
+            loadDashboard();
+        } else {
+            showAlert(d.error || 'Login failed', 'error');
+        }
+    } catch {
+        showAlert('Connection error. Is the server running?', 'error');
+    }
+}
+
+function logout() {
+    currentAdmin = null;
+    document.getElementById('dashboardSection').classList.add('hidden');
+    document.getElementById('loginSection').classList.remove('hidden');
+    showAlert('Logged out successfully', 'info');
+}
+
+// ── DASHBOARD ─────────────────────────────────────────
+async function loadDashboard() {
+    await Promise.all([
+        loadAdminStats(),
+        loadAdminTickets(),
+        loadTopRoutes(),
+        loadTopTravelers()
+    ]);
+}
+
+async function loadAdminStats() {
+    try {
+        const [tod, yest, mon, all] = await Promise.all([
+            fetch(`${API}/admin/revenue?period=today`).then(r=>r.json()),
+            fetch(`${API}/admin/revenue?period=yesterday`).then(r=>r.json()),
+            fetch(`${API}/admin/revenue?period=month`).then(r=>r.json()),
+            fetch(`${API}/admin/revenue?period=all`).then(r=>r.json()),
+        ]);
+
+        // safely round revenue values
+        const fmt = v => v ? Number(v).toFixed(0) : '0';
+
+        document.getElementById('adminStats').innerHTML = `
+            <div class="stat-card">
+                <div class="stat-val">₹${fmt(tod.data.total_revenue)}</div>
+                <div class="stat-lbl">Today's Revenue</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val">${tod.data.total_tickets || 0}</div>
+                <div class="stat-lbl">Today's Tickets</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val">₹${fmt(yest.data.total_revenue)}</div>
+                <div class="stat-lbl">Yesterday's Revenue</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val">₹${fmt(mon.data.total_revenue)}</div>
+                <div class="stat-lbl">This Month</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val">₹${fmt(all.data.total_revenue)}</div>
+                <div class="stat-lbl">All-Time Revenue</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val">${all.data.total_tickets || 0}</div>
+                <div class="stat-lbl">Total Tickets</div>
+            </div>
+        `;
+    } catch(err) {
+        console.error('Stats error:', err);
+        document.getElementById('adminStats').innerHTML = '<div>Failed to load stats</div>';
+    }
+}
+
+async function loadAdminTickets() {
+    const limit = document.getElementById('ticketLimit').value;
+    try {
+        const r = await fetch(`${API}/admin/tickets?limit=${limit}`);
+        const d = await r.json();
+        if (d.success && d.data.length > 0) {
+            document.getElementById('adminTickets').innerHTML = d.data.map(t => `
+                <div class="ticket-item">
+                    <div class="ticket-item-route">${esc(t.from_station)} → ${esc(t.to_station)}</div>
+                    <div class="ticket-item-meta">
+                        👤 ${esc(t.full_name)} (${t.phone})
+                        &bull; ₹${t.fare_amount}
+                        &bull; ${new Date(t.journey_date).toLocaleString('en-IN')}
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            document.getElementById('adminTickets').innerHTML =
+                '<div style="text-align:center; padding:20px; color:var(--text-muted);">No tickets found</div>';
+        }
+    } catch(err) {
+        console.error('Tickets error:', err);
+        document.getElementById('adminTickets').innerHTML = '<div>Failed to load tickets</div>';
+    }
+}
+
+async function loadTopRoutes() {
+    try {
+        const r = await fetch(`${API}/admin/top-routes?limit=5`);
+        const d = await r.json();
+        if (d.success && d.data.length > 0) {
+            document.getElementById('topRoutes').innerHTML = d.data.map((rt, i) => `
+                <div class="ticket-item">
+                    <div class="ticket-item-route">#${i+1} ${esc(rt.from_station)} → ${esc(rt.to_station)}</div>
+                    <div class="ticket-item-meta">
+                        ${rt.booking_count} bookings &bull; ₹${Number(rt.total_revenue).toFixed(0)} total revenue
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            document.getElementById('topRoutes').innerHTML =
+                '<div style="text-align:center; padding:20px; color:var(--text-muted);">No data yet</div>';
+        }
+    } catch {
+        document.getElementById('topRoutes').innerHTML = '<div>Failed to load</div>';
+    }
+}
+
+async function loadTopTravelers() {
+    try {
+        const r = await fetch(`${API}/admin/top-travelers?limit=5`);
+        const d = await r.json();
+        if (d.success && d.data.length > 0) {
+            document.getElementById('topTravelers').innerHTML = d.data.map((u, i) => `
+                <div class="ticket-item">
+                    <div class="ticket-item-route">#${i+1} ${esc(u.full_name)}</div>
+                    <div class="ticket-item-meta">
+                        📞 ${u.phone}
+                        &bull; ${u.total_trips || 0} trips
+                        &bull; ₹${Number(u.total_spent || 0).toFixed(0)} spent
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            document.getElementById('topTravelers').innerHTML =
+                '<div style="text-align:center; padding:20px; color:var(--text-muted);">No data yet</div>';
+        }
+    } catch {
+        document.getElementById('topTravelers').innerHTML = '<div>Failed to load</div>';
+    }
+}
+
+function esc(str) {
+    return String(str || '')
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DMRC Metro Booking System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #1a3a6b;
+            --primary-light: #2655a3;
+            --accent: #e63946;
+            --bg: #f0f4f8;
+            --bg-white: #ffffff;
+            --text: #1a2236;
+            --text-muted: #5a6a80;
+            --border: #d6e0ee;
+            --shadow: rgba(26, 58, 107, 0.12);
+            --success: #22863a;
+            --success-bg: #dcfce7;
+            --error: #9b1c1c;
+            --error-bg: #fee2e2;
+            --info: #1e40af;
+            --info-bg: #dbeafe;
+        }
+
+        body.dark-mode {
+            --primary: #3b82f6;
+            --primary-light: #60a5fa;
+            --bg: #0f172a;
+            --bg-white: #1e293b;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --shadow: rgba(0,0,0,0.4);
+            --success-bg: #14532d;
+            --error-bg: #7f1d1d;
+            --info-bg: #1e3a8a;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 24px 16px;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; }
+
+        /* ── HEADER ── */
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+            position: relative;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 0; right: 0;
+            background: var(--bg-white);
+            border: 2px solid var(--border);
+            border-radius: 40px;
+            padding: 7px 18px;
+            cursor: pointer;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text);
+            transition: all 0.25s;
+        }
+        .theme-toggle:hover { border-color: var(--primary); color: var(--primary); }
+
+        .logo-row { display: flex; align-items: center; justify-content: center; gap: 14px; }
+
+        .logo-text {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2.6rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 1px;
+        }
+
+        .logo-badge {
+            background: var(--accent);
+            color: #fff;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .tagline { font-size: 1rem; color: var(--text-muted); margin-top: 6px; }
+
+        /* ── CARD ── */
+        .card {
+            background: var(--bg-white);
+            border-radius: 18px;
+            padding: 32px;
+            box-shadow: 0 6px 24px var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        /* ── TABS ── */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 28px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 13px 16px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .tab-btn:hover { color: var(--primary); }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+
+        @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+        /* ── FORMS ── */
+        .form-group { margin-bottom: 18px; position: relative; }
+        label { display: block; margin-bottom: 7px; font-weight: 600; font-size: 0.92rem; }
+
+        input, select {
+            width: 100%;
+            padding: 11px 15px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 9px;
+            color: var(--text);
+            font-size: 0.97rem;
+            font-family: 'DM Sans', sans-serif;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        input:focus, select:focus { outline: none; border-color: var(--primary); background: var(--bg-white); }
+        input::placeholder { color: var(--text-muted); }
+
+        /* ── BUTTONS ── */
+        .btn {
+            padding: 12px 28px;
+            background: var(--primary);
+            border: none;
+            border-radius: 9px;
+            color: #fff;
+            font-size: 0.97rem;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        .btn:hover { background: var(--primary-light); transform: translateY(-1px); box-shadow: 0 4px 14px var(--shadow); }
+        .btn:active { transform: translateY(0); }
+
+        .btn-sm { width: auto; padding: 8px 18px; font-size: 0.88rem; }
+        .btn-red { background: var(--accent); }
+        .btn-red:hover { background: #c1121f; }
+        .btn-ghost { background: var(--bg); color: var(--text); border: 2px solid var(--border); }
+        .btn-ghost:hover { background: var(--border); box-shadow: none; }
+
+        /* ── USER INFO ── */
+        .user-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: linear-gradient(120deg, #dbeafe, #e0f2fe);
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+            margin-bottom: 22px;
+        }
+        body.dark-mode .user-bar { background: linear-gradient(120deg, #1e3a8a, #1e4070); }
+        .user-name { font-size: 1.2rem; font-weight: 700; color: var(--primary); }
+        body.dark-mode .user-name { color: #bfdbfe; }
+        .user-id { font-size: 0.85rem; color: var(--text-muted); margin-top: 3px; }
+
+        /* ── WALLET ── */
+        .wallet-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: #fff;
+            padding: 24px;
+            border-radius: 14px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px rgba(26,58,107,0.25);
+        }
+        .wallet-label { font-size: 0.82rem; opacity: 0.85; margin-bottom: 6px; letter-spacing: 1px; text-transform: uppercase; }
+        .wallet-amount { font-family: 'Rajdhani', sans-serif; font-size: 2.8rem; font-weight: 700; margin-bottom: 14px; }
+        .wallet-card .btn { background: rgba(255,255,255,0.2); backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.35); }
+        .wallet-card .btn:hover { background: rgba(255,255,255,0.3); }
+
+        /* ── SEARCH RESULTS ── */
+        .search-results {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0; right: 0;
+            background: var(--bg-white);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            max-height: 240px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 8px 20px var(--shadow);
+        }
+        .search-result-item {
+            padding: 11px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background 0.15s;
+        }
+        .search-result-item:last-child { border-bottom: none; }
+        .search-result-item:hover { background: var(--bg); }
+        .station-label { font-weight: 600; font-size: 0.95rem; }
+        .line-badge {
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #fff;
+            white-space: nowrap;
+            flex-shrink: 0;
+            margin-left: 10px;
+        }
+
+        /* ── ROUTE DISPLAY ── */
+        .route-display {
+            margin-top: 28px;
+            padding: 24px;
+            background: var(--bg);
+            border-radius: 14px;
+            border: 2px solid var(--border);
+        }
+
+        .route-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 18px;
+            padding-bottom: 18px;
+            border-bottom: 2px solid var(--border);
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .route-title { font-family: 'Rajdhani', sans-serif; font-size: 1.4rem; font-weight: 700; }
+        .route-meta { font-size: 0.88rem; color: var(--text-muted); margin-top: 5px; }
+
+        .fare-badge {
+            background: var(--accent);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 9px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.7rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .interchange-alert {
+            padding: 11px 15px;
+            background: #fff5f5;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+            margin-bottom: 14px;
+            font-size: 0.9rem;
+            color: var(--error);
+        }
+        body.dark-mode .interchange-alert { background: #450a0a; }
+
+        .station-list { list-style: none; }
+        .station-item {
+            padding: 11px 15px;
+            margin-bottom: 6px;
+            background: var(--bg-white);
+            border-left: 3px solid var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .station-item:hover { transform: translateX(3px); box-shadow: 0 2px 8px var(--shadow); }
+        .station-item.is-interchange { border-left-color: var(--accent); }
+
+        .station-num {
+            width: 26px; height: 26px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        .station-item.is-interchange .station-num { background: var(--accent); }
+        .station-item-name { font-weight: 600; font-size: 0.93rem; }
+        .interchange-tag {
+            margin-left: auto;
+            padding: 3px 10px;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        /* ── TICKET CARD ── */
+        .ticket-card {
+            background: var(--bg-white);
+            border: 2px solid var(--primary);
+            border-radius: 14px;
+            padding: 28px;
+            margin-top: 22px;
+            text-align: center;
+        }
+        .ticket-card .qr-wrap {
+            padding: 18px;
+            background: var(--bg);
+            border-radius: 10px;
+            display: inline-block;
+            margin: 16px 0;
+        }
+        .ticket-card .qr-wrap img { display: block; max-width: 180px; }
+
+        /* ── HISTORY ── */
+        .history-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+        .filter-btn {
+            padding: 7px 15px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+        }
+        .filter-btn:hover, .filter-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+        .ticket-history-item {
+            padding: 18px;
+            background: var(--bg);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--primary);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .ticket-history-item:hover { transform: translateX(4px); box-shadow: 0 4px 14px var(--shadow); }
+
+        .th-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .th-route { font-weight: 700; font-size: 1rem; }
+        .th-fare { font-family: 'Rajdhani', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--accent); }
+        .th-meta { font-size: 0.85rem; color: var(--text-muted); }
+        .th-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+
+        .status-pill {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+        .pill-active { background: var(--success-bg); color: var(--success); }
+        .pill-used { background: var(--info-bg); color: var(--info); }
+        .pill-expired { background: var(--error-bg); color: var(--error); }
+        .pill-cancelled { background: #fef9c3; color: #854d0e; }
+
+        /* ── STATS ── */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 24px; }
+        .stat-card { background: var(--bg); border: 2px solid var(--border); border-radius: 12px; padding: 20px; text-align: center; }
+        .stat-val { font-family: 'Rajdhani', sans-serif; font-size: 2rem; font-weight: 700; color: var(--primary); }
+        .stat-lbl { font-size: 0.82rem; color: var(--text-muted); font-weight: 600; margin-top: 4px; }
+
+        /* ── ALERTS ── */
+        .alert {
+            padding: 13px 18px;
+            border-radius: 9px;
+            margin-bottom: 16px;
+            border-left: 4px solid;
+            font-size: 0.93rem;
+            animation: slideIn 0.3s;
+        }
+        @keyframes slideIn { from { opacity:0; transform:translateX(30px); } to { opacity:1; transform:translateX(0); } }
+        .alert-success { background: var(--success-bg); border-color: #22c55e; color: var(--success); }
+        .alert-error   { background: var(--error-bg);   border-color: #ef4444; color: var(--error); }
+        .alert-info    { background: var(--info-bg);    border-color: #3b82f6; color: var(--info); }
+
+        /* ── MODALS ── */
+        .modal-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.65);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content {
+            background: var(--bg-white);
+            border-radius: 18px;
+            padding: 32px;
+            width: 100%;
+            max-width: 560px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.35);
+            animation: modalIn 0.25s ease-out;
+        }
+        @keyframes modalIn { from { opacity:0; transform:translateY(-30px) scale(0.97); } to { opacity:1; transform:none; } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
+        .modal-title { font-family: 'Rajdhani', sans-serif; font-size: 1.5rem; font-weight: 700; }
+        .modal-close { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: var(--text-muted); line-height: 1; }
+        .modal-close:hover { color: var(--accent); }
+        .modal-footer { display: flex; gap: 12px; justify-content: flex-end; margin-top: 22px; }
+        .modal-footer .btn { width: auto; min-width: 110px; }
+
+        /* Route option cards */
+        .route-option {
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .route-option:hover { border-color: var(--primary); }
+        .route-option.selected { border-color: var(--primary); background: var(--info-bg); }
+        body.dark-mode .route-option.selected { background: #1e3a8a; }
+        .ro-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .ro-title { font-weight: 700; color: var(--primary); font-size: 1rem; }
+        .ro-fare { font-family: 'Rajdhani', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+        .ro-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+        .badge { padding: 3px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; }
+        .badge-blue { background: var(--info-bg); color: var(--info); }
+        .badge-red  { background: var(--error-bg); color: var(--error); }
+        .ro-detail { font-size: 0.85rem; color: var(--text-muted); }
+
+        /* Amount selector */
+        .amount-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+        .amount-option {
+            padding: 14px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 9px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+        .amount-option:hover { border-color: var(--primary); }
+        .amount-option.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+        /* Misc */
+        .divider { height: 2px; background: var(--border); margin: 20px 0; }
+        .empty-state { text-align: center; padding: 50px 20px; color: var(--text-muted); }
+        .empty-icon { font-size: 3.5rem; margin-bottom: 16px; opacity: 0.5; }
+        .loading { text-align: center; padding: 40px; color: var(--text-muted); font-weight: 600; }
+        .hidden { display: none !important; }
+        .admin-link { text-align: center; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border); }
+        .admin-link a { color: var(--primary); text-decoration: none; font-weight: 600; }
+        .admin-link a:hover { text-decoration: underline; }
+
+        @media (max-width: 600px) {
+            .logo-text { font-size: 2rem; }
+            .card { padding: 20px; }
+            .tabs { flex-direction: column; }
+            .amount-grid { grid-template-columns: repeat(2, 1fr); }
+            .theme-toggle { position: static; margin-bottom: 14px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+        <div class="logo-row">
+            <h1 class="logo-text">DMRC Metro</h1>
+            <span class="logo-badge">OFFICIAL</span>
+        </div>
+        <p class="tagline">Delhi Metro Rail Corporation</p>
+    </div>
+
+    <!-- MAIN CARD -->
+    <div class="card">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('login', this)">🔐 Login</button>
+            <button class="tab-btn" onclick="showTab('register', this)">📝 Register</button>
+            <button class="tab-btn hidden" id="bookingTabBtn" onclick="showTab('booking', this)">🎫 Book Ticket</button>
+            <button class="tab-btn hidden" id="historyTabBtn" onclick="showTab('history', this)">📜 History</button>
+            <button class="tab-btn hidden" id="statsTabBtn" onclick="showTab('stats', this)">📊 Stats</button>
+        </div>
+
+        <!-- LOGIN -->
+        <div id="login" class="tab-content active">
+            <h2 style="margin-bottom:20px;">Login to Your Account</h2>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="loginPhone" placeholder="10-digit phone number" required maxlength="10" pattern="[0-9]{10}">
+                </div>
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" id="loginDOB" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+            </form>
+            <div class="admin-link"><a href="admin.html">🔒 Admin Login</a></div>
+        </div>
+
+        <!-- REGISTER -->
+        <div id="register" class="tab-content">
+            <h2 style="margin-bottom:20px;">Create New Account</h2>
+            <form onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="regName" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="regPhone" placeholder="10-digit phone number" required maxlength="10" pattern="[0-9]{10}">
+                </div>
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" id="regDOB" required>
+                </div>
+                <button type="submit" class="btn">Register</button>
+            </form>
+        </div>
+
+        <!-- BOOKING -->
+        <div id="booking" class="tab-content">
+            <div id="userBar" class="user-bar hidden">
+                <div>
+                    <div class="user-name" id="userName"></div>
+                    <div class="user-id" id="userId"></div>
+                </div>
+                <button class="btn btn-ghost btn-sm" onclick="logout()">Logout</button>
+            </div>
+
+            <div class="wallet-card">
+                <div class="wallet-label">Wallet Balance</div>
+                <div class="wallet-amount">₹<span id="walletBalance">0.00</span></div>
+                <button class="btn btn-sm" onclick="showRechargeModal()">💳 Recharge Wallet</button>
+            </div>
+
+            <h2 style="margin-bottom:18px;">Book Your Ticket</h2>
+
+            <div class="form-group">
+                <label>From Station</label>
+                <input type="text" id="fromStation" placeholder="Search source station..." autocomplete="off"
+                       oninput="searchStations('from')">
+                <div id="fromResults" class="search-results hidden"></div>
+            </div>
+
+            <div class="form-group">
+                <label>To Station</label>
+                <input type="text" id="toStation" placeholder="Search destination station..." autocomplete="off"
+                       oninput="searchStations('to')">
+                <div id="toResults" class="search-results hidden"></div>
+            </div>
+
+            <button class="btn" onclick="calculateRoute()">🔍 Find Route &amp; Fare</button>
+            <div id="routeDisplay"></div>
+        </div>
+
+        <!-- HISTORY -->
+        <div id="history" class="tab-content">
+            <h2 style="margin-bottom:18px;">📜 Ticket History</h2>
+            <div class="history-filters">
+                <button class="filter-btn active" onclick="filterHistory('all', this)">All</button>
+                <button class="filter-btn" onclick="filterHistory('Active', this)">Active</button>
+                <button class="filter-btn" onclick="filterHistory('Used', this)">Used</button>
+                <button class="filter-btn" onclick="filterHistory('Expired', this)">Expired</button>
+            </div>
+            <div id="historyList"></div>
+        </div>
+
+        <!-- STATS -->
+        <div id="stats" class="tab-content">
+            <h2 style="margin-bottom:18px;">📊 Your Journey Stats</h2>
+
+            <!-- Stat Cards -->
+            <div class="stats-grid" id="userStatsGrid"></div>
+
+            <!-- Recent Journeys -->
+            <h3 style="margin-bottom:14px; margin-top:8px;">🚇 Recent Journeys</h3>
+            <div id="recentJourneys"></div>
+
+            <!-- Recharge History -->
+            <h3 style="margin-bottom:14px; margin-top:24px;">💳 Recharge History</h3>
+            <div id="rechargeHistory"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ROUTE SELECTION MODAL -->
+<div id="routeModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Select Your Route</h3>
+            <button class="modal-close" onclick="closeModal('routeModal')">×</button>
+        </div>
+        <div id="routeOptions"></div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeModal('routeModal')">Cancel</button>
+            <button class="btn" onclick="proceedWithSelectedRoute()">Proceed to Book</button>
+        </div>
+    </div>
+</div>
+
+<!-- BOOKING CONFIRM MODAL -->
+<div id="confirmModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Confirm Booking</h3>
+            <button class="modal-close" onclick="closeModal('confirmModal')">×</button>
+        </div>
+        <div id="confirmationDetails"></div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeModal('confirmModal')">Cancel</button>
+            <button class="btn" onclick="confirmBooking()">Confirm &amp; Pay</button>
+        </div>
+    </div>
+</div>
+
+<!-- WALLET RECHARGE MODAL -->
+<div id="rechargeModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">💳 Recharge Wallet</h3>
+            <button class="modal-close" onclick="closeModal('rechargeModal')">×</button>
+        </div>
+        <p style="margin-bottom:16px; color:var(--text-muted); font-size:0.9rem;">
+            Choose an amount or enter custom (Min ₹100)
+        </p>
+        <div class="amount-grid">
+            <div class="amount-option selected" onclick="selectAmount(100, this)">₹100</div>
+            <div class="amount-option" onclick="selectAmount(200, this)">₹200</div>
+            <div class="amount-option" onclick="selectAmount(500, this)">₹500</div>
+            <div class="amount-option" onclick="selectAmount(1000, this)">₹1000</div>
+            <div class="amount-option" onclick="selectAmount(2000, this)">₹2000</div>
+            <div class="amount-option" onclick="selectAmount(5000, this)">₹5000</div>
+        </div>
+        <input type="number" id="customAmount" placeholder="Or enter custom amount" min="100"
+               oninput="selectCustomAmount()" style="margin-top:4px;">
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeModal('rechargeModal')">Cancel</button>
+            <button class="btn" onclick="processRecharge()">Recharge Now</button>
+        </div>
+    </div>
+</div>
+<!-- KHUSHI CHATBOT WITH IMAGE - ADD THIS TO index.html BEFORE </body> -->
+
+<!-- SETUP INSTRUCTIONS:
+1. Save the uploaded image as: public/khushi.png
+2. Copy this entire file content
+3. Paste in index.html before </body>
+-->
+
+<!-- Chatbot Styles -->
+<style>
+    /* Chatbot Button */
+    .chatbot-button {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+        animation: pulse 2s infinite;
+        overflow: hidden;
+        padding: 0;
+    }
+
+    .chatbot-button img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .chatbot-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 25px rgba(102, 126, 234, 0.7);
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    /* Chatbot Window */
+    .chatbot-window {
+        position: fixed;
+        bottom: 120px;
+        right: 30px;
+        width: 400px;
+        height: 600px;
+        background: var(--bg-white);
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        z-index: 10001;
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        animation: slideUp 0.3s ease-out;
+    }
+
+    .chatbot-window.active {
+        display: flex;
+    }
+
+    @keyframes slideUp {
+        from { 
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        to { 
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Chatbot Header */
+    .chatbot-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .chatbot-avatar {
+        width: 50px;
+        height: 50px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .chatbot-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .chatbot-info h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+
+    .chatbot-info p {
+        margin: 5px 0 0 0;
+        font-size: 0.85rem;
+        opacity: 0.9;
+    }
+
+    .chatbot-close {
+        margin-left: auto;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 5px;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        transition: all 0.3s;
+    }
+
+    .chatbot-close:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Chatbot Messages */
+    .chatbot-messages {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background: var(--bg-light);
+    }
+
+    .chatbot-message {
+        margin-bottom: 15px;
+        animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message-bot {
+        display: flex;
+        gap: 10px;
+    }
+
+    .message-user {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .message-bubble {
+        max-width: 75%;
+        padding: 12px 16px;
+        border-radius: 16px;
+        font-size: 0.95rem;
+        line-height: 1.4;
+    }
+
+    .message-bot .message-bubble {
+        background: white;
+        color: var(--text-dark);
+        border-bottom-left-radius: 4px;
+    }
+
+    .message-user .message-bubble {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+
+    .message-avatar {
+        width: 35px;
+        height: 35px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+
+    .message-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Quick Replies */
+    .chatbot-quick-replies {
+        padding: 15px 20px;
+        background: var(--bg-white);
+        border-top: 1px solid var(--border);
+    }
+
+    .quick-reply-title {
+        font-size: 0.85rem;
+        color: var(--text-gray);
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    .quick-reply-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .quick-reply-btn {
+        padding: 8px 16px;
+        background: var(--bg-light);
+        border: 2px solid var(--border);
+        border-radius: 20px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        color: var(--text-dark);
+        font-weight: 600;
+    }
+
+    .quick-reply-btn:hover {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-color: #667eea;
+        transform: translateY(-2px);
+    }
+
+    /* Typing Indicator */
+    .typing-indicator {
+        display: none;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        background: white;
+        border-radius: 16px;
+        width: fit-content;
+        margin-bottom: 15px;
+    }
+
+    .typing-indicator.active {
+        display: flex;
+    }
+
+    .typing-dot {
+        width: 8px;
+        height: 8px;
+        background: #667eea;
+        border-radius: 50%;
+        animation: typing 1.4s infinite;
+    }
+
+    .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    @keyframes typing {
+        0%, 60%, 100% { transform: translateY(0); }
+        30% { transform: translateY(-10px); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .chatbot-window {
+            width: calc(100% - 40px);
+            height: calc(100% - 160px);
+            right: 20px;
+            bottom: 110px;
+        }
+
+        .chatbot-button {
+            width: 60px;
+            height: 60px;
+            right: 20px;
+            bottom: 20px;
+        }
+    }
+</style>
+
+<!-- Chatbot HTML -->
+<button class="chatbot-button" onclick="toggleChatbot()" id="chatbotBtn">
+    <img src="khushi.png" alt="Khushi">
+</button>
+
+<div class="chatbot-window" id="chatbotWindow">
+    <div class="chatbot-header">
+        <div class="chatbot-avatar">
+            <img src="khushi.png" alt="Khushi">
+        </div>
+        <div class="chatbot-info">
+            <h3>Khushi</h3>
+            <p>DMRC Virtual Assistant</p>
+        </div>
+        <button class="chatbot-close" onclick="toggleChatbot()">×</button>
+    </div>
+
+    <div class="chatbot-messages" id="chatMessages">
+        <!-- Messages will appear here -->
+    </div>
+
+    <div class="chatbot-quick-replies">
+        <div class="quick-reply-title">Choose a question:</div>
+        <div class="quick-reply-buttons">
+            <button class="quick-reply-btn" onclick="askQuestion('hours')">🕒 Operating Hours</button>
+            <button class="quick-reply-btn" onclick="askQuestion('fare')">💰 Fare Info</button>
+            <button class="quick-reply-btn" onclick="askQuestion('recharge')">💳 Recharge Wallet</button>
+            <button class="quick-reply-btn" onclick="askQuestion('ticket')">🎫 Book Ticket</button>
+            <!-- <button class="quick-reply-btn" onclick="askQuestion('refund')">💸 Refund Policy</button> -->
+            <button class="quick-reply-btn" onclick="askQuestion('contact')">📞 Contact Support</button>
+            <button class="quick-reply-btn" onclick="askQuestion('validity')">⏰ Ticket Validity</button>
+            <button class="quick-reply-btn" onclick="askQuestion('stations')">🚇 Total Stations</button>
+        </div>
+    </div>
+</div>
+
+<!-- Chatbot Script -->
+<script>
+    // FAQ Database
+    const khushiFAQs = {
+        hours: {
+            question: "What are the operating hours?",
+            answer: "Delhi Metro operates from 6:00 AM to 11:00 PM on all days. First train starts at 6:00 AM and last train departs by 11:00 PM. 🚇"
+        },
+        fare: {
+            question: "How is the fare calculated?",
+            answer: "Fare is calculated based on the number of stations traveled:\n\n• 1-7 stations: ₹5\n• 8-14 stations: ₹3\n• 15+ stations: ₹2\n\nMaximum fare is ₹70. 💰"
+        },
+        recharge: {
+            question: "How to recharge wallet?",
+            answer: "To recharge your wallet:\n\n1. Login to your account\n2. Go to 'Book Ticket' tab\n3. Click on 'Recharge Wallet' button\n4. Choose amount (₹100-₹5000) or enter custom\n5. Click 'Recharge Now'\n\nMinimum recharge: ₹100 💳"
+        },
+        ticket: {
+            question: "How to book a ticket?",
+            answer: "Booking a ticket is easy:\n\n1. Login to your account\n2. Select 'From' station\n3. Select 'To' station\n4. Click 'Find Route & Fare'\n5. Choose your preferred route\n6. Click 'Confirm & Pay'\n\nDone! Your ticket is ready! 🎫"
+        },
+        contact: {
+            question: "How to contact support?",
+            answer: "Contact DMRC Support:\n\n📞 Helpline: 155370\n📧 Email: customercare@dmrc.org\n⏰ Available: 24/7\n\nFor emergencies, contact station staff immediately! 🆘"
+        },
+        validity: {
+            question: "How long is a ticket valid?",
+            answer: "Ticket validity depends on journey:\n\n• Short journey (1-12 stations): 1 hour\n• Medium journey (13-21 stations): 2 hours\n• Long journey (22+ stations): 3 hours\n\nFrom time of booking. Use before expiry! ⏰"
+        },
+        stations: {
+            question: "How many stations are there?",
+            answer: "Delhi Metro Network:\n\n🚇 Total Stations: 286\n🎨 Lines: 12 (Red, Blue, Yellow, Green, Violet, Pink, Magenta, Orange, Grey, Rapid Metro, Airport Express, Aqua)\n📏 Total Length: 391 km\n\nOne of the largest metro networks in the world! 🌟"
+        }
+    };
+
+    let chatMessages = [];
+    let isChatbotOpen = false;
+
+    // Initialize chatbot
+    function initChatbot() {
+        // Welcome message
+        addBotMessage("Namaste! 🙏 I'm Khushi, your DMRC virtual assistant. How can I help you today?");
+    }
+
+    // Toggle chatbot
+    function toggleChatbot() {
+        isChatbotOpen = !isChatbotOpen;
+        const window = document.getElementById('chatbotWindow');
+        
+        if (isChatbotOpen) {
+            window.classList.add('active');
+            if (chatMessages.length === 0) {
+                initChatbot();
+            }
+        } else {
+            window.classList.remove('active');
+        }
+    }
+
+    // Add bot message
+    function addBotMessage(text) {
+        const messagesDiv = document.getElementById('chatMessages');
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'chatbot-message message-bot';
+        
+        messageDiv.innerHTML = `
+            <div class="message-avatar">
+                <img src="khushi.png" alt="Khushi">
+            </div>
+            <div class="message-bubble">${text.replace(/\n/g, '<br>')}</div>
+        `;
+        
+        messagesDiv.appendChild(messageDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        
+        chatMessages.push({ type: 'bot', text });
+    }
+
+    // Add user message
+    function addUserMessage(text) {
+        const messagesDiv = document.getElementById('chatMessages');
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'chatbot-message message-user';
+        
+        messageDiv.innerHTML = `
+            <div class="message-bubble">${text}</div>
+        `;
+        
+        messagesDiv.appendChild(messageDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        
+        chatMessages.push({ type: 'user', text });
+    }
+
+    // Show typing indicator
+    function showTyping() {
+        const messagesDiv = document.getElementById('chatMessages');
+        
+        const typingDiv = document.createElement('div');
+        typingDiv.id = 'typingIndicator';
+        typingDiv.className = 'chatbot-message message-bot';
+        typingDiv.innerHTML = `
+            <div class="message-avatar">
+                <img src="khushi.png" alt="Khushi">
+            </div>
+            <div class="typing-indicator active">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        `;
+        
+        messagesDiv.appendChild(typingDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    // Hide typing indicator
+    function hideTyping() {
+        const typingDiv = document.getElementById('typingIndicator');
+        if (typingDiv) {
+            typingDiv.remove();
+        }
+    }
+
+    // Ask question
+    function askQuestion(topic) {
+        const faq = khushiFAQs[topic];
+        
+        if (!faq) return;
+        
+        // Add user message
+        addUserMessage(faq.question);
+        
+        // Show typing
+        showTyping();
+        
+        // Simulate thinking delay
+        setTimeout(() => {
+            hideTyping();
+            addBotMessage(faq.answer);
+            
+            // Add follow-up
+            setTimeout(() => {
+                addBotMessage("Is there anything else I can help you with? 😊");
+            }, 500);
+        }, 1000);
+    }
+</script>
+
+<script>
+const API = 'http://localhost:3000/api';
+
+let currentUser        = null;
+let selectedFrom       = null; // station_id
+let selectedTo         = null; // station_id
+let currentRoutes      = null;
+let selectedRouteIdx   = 0;
+let selectedAmount     = 100;
+let currentFilter      = 'all';
+let searchTimer        = null;
+
+// ── THEME ────────────────────────────────────────────
+function toggleTheme() {
+    const dark = document.body.classList.toggle('dark-mode');
+    localStorage.setItem('dmrc_theme', dark ? 'dark' : 'light');
+    document.querySelector('.theme-toggle').textContent = dark ? '☀️ Light Mode' : '🌙 Dark Mode';
+}
+if (localStorage.getItem('dmrc_theme') === 'dark') {
+    document.body.classList.add('dark-mode');
+    document.querySelector('.theme-toggle').textContent = '☀️ Light Mode';
+}
+
+// ── TABS ─────────────────────────────────────────────
+// BUG FIX: pass `btn` element directly instead of relying on `event`
+function showTab(tabName, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabName).classList.add('active');
+    if (btn) btn.classList.add('active');
+
+    if (tabName === 'history' && currentUser) loadTicketHistory();
+    if (tabName === 'stats'   && currentUser) loadUserStats();
+}
+
+// ── MODALS ───────────────────────────────────────────
+function openModal(id)  { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+// ── ALERTS ───────────────────────────────────────────
+function showAlert(msg, type = 'info') {
+    const el = document.createElement('div');
+    el.className = `alert alert-${type}`;
+    el.textContent = msg;
+    const card = document.querySelector('.card');
+    card.insertBefore(el, card.firstChild);
+    setTimeout(() => el.remove(), 5000);
+}
+
+// ── AUTH ─────────────────────────────────────────────
+async function handleLogin(e) {
+    e.preventDefault();
+    const phone = document.getElementById('loginPhone').value.trim();
+    const dob   = document.getElementById('loginDOB').value;
+    try {
+        const r = await fetch(`${API}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone, dob })
+        });
+        const d = await r.json();
+        if (d.success) {
+            if (d.data.user_type === 'admin') {
+                showAlert('Admin users should use the admin portal', 'error'); return;
+            }
+            currentUser = d.data;
+            ['bookingTabBtn','historyTabBtn','statsTabBtn'].forEach(id =>
+                document.getElementById(id).classList.remove('hidden'));
+            updateUserUI();
+            await loadWalletBalance();
+            showAlert('Login successful! ', 'success');
+            showTab('booking', document.getElementById('bookingTabBtn'));
+        } else {
+            showAlert(d.error || 'Login failed', 'error');
+        }
+    } catch {
+        showAlert('Connection error. Is the server running?', 'error');
+    }
+}
+
+async function handleRegister(e) {
+    e.preventDefault();
+    const full_name = document.getElementById('regName').value.trim();
+    const phone     = document.getElementById('regPhone').value.trim();
+    const dob       = document.getElementById('regDOB').value;
+    try {
+        const r = await fetch(`${API}/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ full_name, phone, dob })
+        });
+        const d = await r.json();
+        if (d.success) {
+            showAlert(`Registered! Your ID: ${d.data.unique_id} `, 'success');
+            setTimeout(() => {
+                showTab('login', document.querySelector('.tab-btn'));
+                document.getElementById('loginPhone').value = phone;
+                document.getElementById('loginDOB').value   = dob;
+            }, 2000);
+        } else {
+            showAlert(d.error || 'Registration failed', 'error');
+        }
+    } catch {
+        showAlert('Connection error. Is the server running?', 'error');
+    }
+}
+
+function updateUserUI() {
+    document.getElementById('userBar').classList.remove('hidden');
+    document.getElementById('userName').textContent = currentUser.full_name;
+    document.getElementById('userId').textContent   = `ID: ${currentUser.unique_id}`;
+}
+
+function logout() {
+    currentUser = null; selectedFrom = null; selectedTo = null;
+    ['bookingTabBtn','historyTabBtn','statsTabBtn'].forEach(id =>
+        document.getElementById(id).classList.add('hidden'));
+    document.getElementById('routeDisplay').innerHTML = '';
+    showTab('login', document.querySelector('.tab-btn'));
+    showAlert('Logged out successfully', 'info');
+}
+
+// ── WALLET ───────────────────────────────────────────
+async function loadWalletBalance() {
+    if (!currentUser) return;
+    try {
+        const r = await fetch(`${API}/wallet/${currentUser.user_id}`);
+        const d = await r.json();
+        document.getElementById('walletBalance').textContent =
+            parseFloat(d.balance || 0).toFixed(2);
+    } catch {
+        document.getElementById('walletBalance').textContent = '0.00';
+    }
+}
+
+function showRechargeModal() {
+    selectedAmount = 100;
+    document.getElementById('customAmount').value = '';
+    document.querySelectorAll('.amount-option').forEach((el, i) =>
+        el.classList.toggle('selected', i === 0));
+    openModal('rechargeModal');
+}
+
+function selectAmount(amt, el) {
+    selectedAmount = amt;
+    document.getElementById('customAmount').value = '';
+    document.querySelectorAll('.amount-option').forEach(e => e.classList.remove('selected'));
+    if (el) el.classList.add('selected');
+}
+
+function selectCustomAmount() {
+    const v = parseInt(document.getElementById('customAmount').value);
+    if (v >= 100) {
+        selectedAmount = v;
+        document.querySelectorAll('.amount-option').forEach(e => e.classList.remove('selected'));
+    }
+}
+
+async function processRecharge() {
+    if (selectedAmount < 100) { showAlert('Minimum recharge is ₹100', 'error'); return; }
+    closeModal('rechargeModal');
+    try {
+        const r = await fetch(`${API}/wallet/recharge`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: currentUser.user_id, amount: selectedAmount })
+        });
+        const d = await r.json();
+        if (d.success) {
+            showAlert(`₹${selectedAmount} recharged! `, 'success');
+            document.getElementById('walletBalance').textContent = d.balance.toFixed(2);
+        } else {
+            showAlert(d.error || 'Recharge failed', 'error');
+        }
+    } catch {
+        showAlert('Recharge failed', 'error');
+    }
+}
+
+// ── STATION SEARCH ───────────────────────────────────
+// BUG FIX: store stations as objects, not in onclick attributes
+// (fixes crash with station names containing apostrophes/commas)
+const stationCache = { from: [], to: [] };
+
+async function searchStations(type) {
+    clearTimeout(searchTimer);
+    const input   = document.getElementById(`${type}Station`);
+    const results = document.getElementById(`${type}Results`);
+    const q       = input.value.trim();
+
+    if (q.length < 2) { results.classList.add('hidden'); return; }
+
+    searchTimer = setTimeout(async () => {
+        try {
+            const r = await fetch(`${API}/stations/search?query=${encodeURIComponent(q)}`);
+            const d = await r.json();
+
+            if (d.success && d.data.length > 0) {
+                stationCache[type] = d.data; // cache results
+
+                results.innerHTML = d.data.map((s, idx) => `
+                    <div class="search-result-item" onclick="selectStation('${type}', ${idx})">
+                        <span class="station-label">${escHtml(s.station_name)}</span>
+                        <span class="line-badge" style="background:${s.line_color_hex}">${escHtml(s.line_name)}</span>
+                    </div>
+                `).join('');
+                results.classList.remove('hidden');
+            } else {
+                results.classList.add('hidden');
+            }
+        } catch (err) {
+            console.error('Search error:', err);
+        }
+    }, 280);
+}
+
+// BUG FIX: use cached object by index instead of passing name via onclick
+function selectStation(type, idx) {
+    const station = stationCache[type][idx];
+    if (!station) return;
+
+    document.getElementById(`${type}Station`).value = station.station_name;
+    document.getElementById(`${type}Results`).classList.add('hidden');
+
+    if (type === 'from') selectedFrom = station.station_id;
+    else                 selectedTo   = station.station_id;
+}
+
+// Simple HTML escape to prevent XSS in station names
+function escHtml(str) {
+    return String(str)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+        .replace(/'/g,'&#39;');
+}
+
+// ── ROUTE CALCULATION ────────────────────────────────
+async function calculateRoute() {
+    if (!selectedFrom || !selectedTo) {
+        showAlert('Please select both stations from the dropdown', 'error'); return;
+    }
+    if (selectedFrom === selectedTo) {
+        showAlert('Source and destination cannot be the same', 'error'); return;
+    }
+    try {
+        const r = await fetch(`${API}/calculate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ from_station_id: selectedFrom, to_station_id: selectedTo })
+        });
+        const d = await r.json();
+        if (d.success) {
+            currentRoutes = d.data;
+            if (d.data.hasMultipleOptions && d.data.routes.length > 1) {
+                showRouteModal(d.data.routes);
+            } else {
+                selectedRouteIdx = 0;
+                displayRoute(d.data.routes[0]);
+            }
+        } else {
+            showAlert(d.error || 'Route calculation failed', 'error');
+        }
+    } catch {
+        showAlert('Route calculation failed. Check server connection.', 'error');
+    }
+}
+
+function showRouteModal(routes) {
+    const minFare = Math.min(...routes.map(r => r.fareAmount));
+    document.getElementById('routeOptions').innerHTML = routes.map((r, i) => `
+        <div class="route-option ${i === 0 ? 'selected' : ''}" onclick="selectRouteOpt(${i})">
+            <div class="ro-header">
+                <span class="ro-title">${i === 0 ? '⚡ Fewer Interchanges' : ' Fewer Stations'}</span>
+                <span class="ro-fare">₹${minFare}</span>
+            </div>
+            <div class="ro-badges">
+                <span class="badge badge-blue">${r.numStations} stations</span>
+                <span class="badge badge-red">${r.interchanges.length} interchange${r.interchanges.length !== 1 ? 's' : ''}</span>
+            </div>
+            <div class="ro-detail">
+                ${r.interchanges.length > 0 ? `Change at: ${escHtml(r.interchanges.join(', '))}` : 'Direct route'}
+            </div>
+        </div>
+    `).join('');
+    openModal('routeModal');
+}
+
+function selectRouteOpt(i) {
+    selectedRouteIdx = i;
+    document.querySelectorAll('.route-option').forEach((el, j) =>
+        el.classList.toggle('selected', j === i));
+}
+
+function proceedWithSelectedRoute() {
+    closeModal('routeModal');
+    displayRoute(currentRoutes.routes[selectedRouteIdx]);
+}
+
+function displayRoute(rd) {
+    const minFare = currentRoutes
+        ? Math.min(...currentRoutes.routes.map(r => r.fareAmount))
+        : rd.fareAmount;
+
+    const stationsHtml = rd.route.map((s, i) => `
+        <li class="station-item ${s.is_interchange ? 'is-interchange' : ''}">
+            <span class="station-num">${i + 1}</span>
+            <div style="flex:1">
+                <div class="station-item-name">${escHtml(s.station_name)}</div>
+                <span class="line-badge" style="background:${s.line_color_hex}; font-size:0.7rem; padding:2px 8px;">${escHtml(s.line_name)}</span>
+            </div>
+            ${s.is_interchange ? '<span class="interchange-tag">INTERCHANGE</span>' : ''}
+        </li>
+    `).join('');
+
+    document.getElementById('routeDisplay').innerHTML = `
+        <div class="route-display">
+            <div class="route-header">
+                <div>
+                    <div class="route-title">${escHtml(rd.route[0].station_name)} → ${escHtml(rd.route[rd.route.length-1].station_name)}</div>
+                    <div class="route-meta">
+                        ${rd.numStations} stations &bull; ${rd.validityHours}h validity
+                        ${rd.interchanges.length > 0 ? ` &bull; ${rd.interchanges.length} interchange(s)` : ' &bull; Direct route'}
+                    </div>
+                </div>
+                <div class="fare-badge">₹${minFare}</div>
+            </div>
+            ${rd.interchanges.length > 0 ? `
+                <div class="interchange-alert">
+                    <strong>Change trains at:</strong> ${escHtml(rd.interchanges.join(', '))}
+                </div>` : ''}
+            <ul class="station-list">${stationsHtml}</ul>
+            <button class="btn" style="margin-top:18px;" onclick="showBookingConfirm()">
+                Book Ticket for ₹${minFare}
+            </button>
+        </div>
+    `;
+}
+
+// ── BOOKING ──────────────────────────────────────────
+function showBookingConfirm() {
+    if (!currentUser) { showAlert('Please login first', 'error'); return; }
+    const rd      = currentRoutes.routes[selectedRouteIdx];
+    const minFare = Math.min(...currentRoutes.routes.map(r => r.fareAmount));
+    const balance = parseFloat(document.getElementById('walletBalance').textContent);
+    const after   = balance - minFare;
+
+    document.getElementById('confirmationDetails').innerHTML = `
+        <div style="text-align:center; margin-bottom:18px;">
+            <div style="font-size:1.2rem; font-weight:700; margin-bottom:6px;">
+                ${escHtml(rd.route[0].station_name)} → ${escHtml(rd.route[rd.route.length-1].station_name)}
+            </div>
+            <div style="color:var(--text-muted); font-size:0.9rem;">
+                ${rd.numStations} stations &bull; ${rd.interchanges.length} interchange(s)
+            </div>
+        </div>
+        <div style="background:var(--bg); padding:18px; border-radius:12px; margin-bottom:14px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+                <span>Fare Amount</span>
+                <strong style="font-size:1.2rem; color:var(--accent);">₹${minFare}</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+                <span>Wallet Balance</span>
+                <strong>₹${balance.toFixed(2)}</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding-top:12px; border-top:2px dashed var(--border);">
+                <span>Balance After</span>
+                <strong style="color:${after >= 0 ? 'var(--primary)' : 'var(--accent)'};">₹${after.toFixed(2)}</strong>
+            </div>
+        </div>
+        ${after < 0 ? '<div class="alert alert-error">Insufficient balance! Please recharge your wallet.</div>' : ''}
+        <div style="background:var(--info-bg); padding:12px 15px; border-radius:8px; font-size:0.88rem; color:var(--info);">
+            ℹ️ Valid for ${rd.validityHours} hour(s) from booking time.
+        </div>
+    `;
+    openModal('confirmModal');
+}
+
+async function confirmBooking() {
+    closeModal('confirmModal');
+    const balance = parseFloat(document.getElementById('walletBalance').textContent);
+    const minFare = Math.min(...currentRoutes.routes.map(r => r.fareAmount));
+    if (balance < minFare) {
+        showAlert('Insufficient wallet balance. Please recharge!', 'error'); return;
+    }
+    await bookTicket();
+}
+
+async function bookTicket() {
+    if (!currentUser || !selectedFrom || !selectedTo) {
+        showAlert('Missing details. Please try again.', 'error'); return;
+    }
+    try {
+        const r = await fetch(`${API}/ticket/generate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: currentUser.user_id,
+                from_station_id: selectedFrom,
+                to_station_id: selectedTo
+            })
+        });
+        const d = await r.json();
+        if (d.success) {
+            showAlert('Ticket booked successfully! ', 'success');
+            await loadWalletBalance();
+            displayTicket(d.data);
+        } else {
+            // Metro closed gets a special prominent message
+            const icon = d.errorCode === 'METRO_CLOSED' ? '🚇 ' : '';
+            showAlert(icon + (d.error || 'Booking failed'), 'error');
+        }
+    } catch (err) {
+        showAlert('Booking failed: ' + err.message, 'error');
+    }
+}
+
+function displayTicket(t) {
+    if (!t || !t.ticketId) { showAlert('Invalid ticket data', 'error'); return; }
+    const from = t.route && t.route.length ? t.route[0].station_name : '?';
+    const to   = t.route && t.route.length ? t.route[t.route.length-1].station_name : '?';
+
+    document.getElementById('routeDisplay').innerHTML = `
+        <div class="ticket-card">
+            <h2 style="color:var(--primary); margin-bottom:6px;"Metro Ticket</h2>
+            <div style="color:var(--text-muted); font-size:0.88rem; margin-bottom:4px;">${escHtml(t.ticketId)}</div>
+            <div style="font-size:1.15rem; font-weight:700; margin-bottom:4px;">${escHtml(from)} → ${escHtml(to)}</div>
+            <div class="qr-wrap">
+                <img src="${t.qrCode}" alt="QR Code">
+            </div>
+            <div style="font-family:'Rajdhani',sans-serif; font-size:2rem; font-weight:700; color:var(--accent);">₹${t.fareAmount}</div>
+            <div style="color:var(--text-muted); margin:6px 0; font-size:0.9rem;">Valid for ${t.validityHours} hour(s)</div>
+            <div style="color:var(--text-muted); font-size:0.85rem;">Until: ${new Date(t.validUntil).toLocaleString('en-IN')}</div>
+            <button class="btn btn-red btn-sm" style="margin-top:18px;" onclick="downloadPDF('${t.ticketId}')">
+                📥 Download PDF
+            </button>
+        </div>
+    `;
+}
+
+function downloadPDF(ticketId) {
+    showAlert('Preparing PDF…', 'info');
+    window.open(`${API}/ticket/download/${ticketId}`, '_blank');
+}
+
+// ── HISTORY ──────────────────────────────────────────
+async function loadTicketHistory() {
+    if (!currentUser) return;
+    document.getElementById('historyList').innerHTML = '<div class="loading">Loading…</div>';
+    try {
+        const statusQ = currentFilter !== 'all' ? `&status=${currentFilter}` : '';
+        const r = await fetch(`${API}/tickets/history/${currentUser.user_id}?limit=50${statusQ}`);
+        const d = await r.json();
+
+        if (d.success && d.data.length > 0) {
+            document.getElementById('historyList').innerHTML = d.data.map(t => `
+                <div class="ticket-history-item">
+                    <div class="th-header">
+                        <div class="th-route">${escHtml(t.from_station)} → ${escHtml(t.to_station)}</div>
+                        <div class="th-fare">₹${t.fare_amount}</div>
+                    </div>
+                    <div class="th-meta">
+                         ${escHtml(t.ticket_id)} &bull;
+                         ${new Date(t.journey_date).toLocaleString('en-IN', {day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}
+                    </div>
+                    <div class="th-footer">
+                        <span class="status-pill pill-${t.ticket_status.toLowerCase()}">${t.ticket_status}</span>
+                        <button class="btn btn-ghost btn-sm" onclick="downloadPDF('${t.ticket_id}')">📥 PDF</button>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            document.getElementById('historyList').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">🎫</div>
+                    <h3>No tickets found</h3>
+                    <p>Book your first ticket to see it here!</p>
+                </div>`;
+        }
+    } catch {
+        document.getElementById('historyList').innerHTML = `
+            <div class="empty-state"><div class="empty-icon">❌</div><h3>Failed to load history</h3></div>`;
+    }
+}
+
+function filterHistory(status, btn) {
+    currentFilter = status;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    loadTicketHistory();
+}
+
+// ── STATS ─────────────────────────────────────────────
+async function loadUserStats() {
+    if (!currentUser) return;
+    document.getElementById('userStatsGrid').innerHTML = '<div class="loading">Loading…</div>';
+    try {
+        const r = await fetch(`${API}/user/stats/${currentUser.user_id}`);
+        const d = await r.json();
+        if (d.success) {
+            const s = d.data;
+            document.getElementById('userStatsGrid').innerHTML = `
+                <div class="stat-card"><div class="stat-val">${s.totalTrips}</div><div class="stat-lbl">Total Trips</div></div>
+                <div class="stat-card"><div class="stat-val">₹${s.totalSpent.toFixed(0)}</div><div class="stat-lbl">Total Spent</div></div>
+                <div class="stat-card"><div class="stat-val">${s.totalStations}</div><div class="stat-lbl">Stations Covered</div></div>
+                <div class="stat-card"><div class="stat-val">${s.thisMonthTrips}</div><div class="stat-lbl">This Month</div></div>
+            `;
+            // Load both sections in parallel
+            await Promise.all([loadRecentJourneys(), loadRechargeHistory()]);
+        }
+    } catch {
+        document.getElementById('userStatsGrid').innerHTML = '<div>Failed to load stats</div>';
+    }
+}
+
+async function loadRecentJourneys() {
+    try {
+        const r = await fetch(`${API}/tickets/history/${currentUser.user_id}?limit=5`);
+        const d = await r.json();
+        if (d.success && d.data.length > 0) {
+            document.getElementById('recentJourneys').innerHTML = d.data.map(t => `
+                <div class="ticket-history-item">
+                    <div class="th-header">
+                        <div class="th-route">${escHtml(t.from_station)} → ${escHtml(t.to_station)}</div>
+                        <div class="th-fare">₹${t.fare_amount}</div>
+                    </div>
+                    <div class="th-meta">📅 ${new Date(t.journey_date).toLocaleString('en-IN', {day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+                </div>
+            `).join('');
+        } else {
+            document.getElementById('recentJourneys').innerHTML = '<div class="empty-state">No recent journeys</div>';
+        }
+    } catch {
+        document.getElementById('recentJourneys').innerHTML = '<div class="empty-state">Failed to load</div>';
+    }
+}
+
+// ── RECHARGE HISTORY ──────────────────────────────────
+async function loadRechargeHistory() {
+    const container = document.getElementById('rechargeHistory');
+    container.innerHTML = '<div class="loading">Loading…</div>';
+    try {
+        const r = await fetch(`${API}/wallet/transactions/${currentUser.user_id}`);
+        const d = await r.json();
+
+        // Filter only recharge transactions for this section
+        const recharges = (d.data || []).filter(t => t.transaction_type === 'recharge');
+
+        if (recharges.length > 0) {
+            container.innerHTML = recharges.map(t => {
+                const date = new Date(t.created_at).toLocaleString('en-IN', {
+                    day: 'numeric', month: 'short', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                });
+                return `
+                <div class="ticket-history-item" style="border-left-color: #22c55e;">
+                    <div class="th-header">
+                        <div class="th-route" style="font-size:0.95rem;">💳 Wallet Recharge</div>
+                        <div class="th-fare" style="color: #22863a;">+₹${parseFloat(t.amount).toFixed(0)}</div>
+                    </div>
+                    <div class="th-meta">
+                        📅 ${date}
+                        &bull; Balance: ₹${parseFloat(t.balance_before).toFixed(0)} → ₹${parseFloat(t.balance_after).toFixed(0)}
+                    </div>
+                </div>`;
+            }).join('');
+        } else {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">💳</div>
+                    <h3>No recharges yet</h3>
+                    <p>Your recharge history will appear here.</p>
+                </div>`;
+        }
+    } catch {
+        container.innerHTML = '<div class="empty-state">Failed to load recharge history</div>';
+    }
+}
+
+// ── CLOSE SEARCH ON OUTSIDE CLICK ───────────────────
+document.addEventListener('click', e => {
+    if (!e.target.closest('.form-group'))
+        document.querySelectorAll('.search-results').forEach(el => el.classList.add('hidden'));
+});
+</script>
+</body>
+</html>

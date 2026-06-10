@@ -1,0 +1,489 @@
+<!-- KHUSHI CHATBOT WITH IMAGE - ADD THIS TO index.html BEFORE </body> -->
+
+<!-- SETUP INSTRUCTIONS:
+1. Save the uploaded image as: public/khushi.png
+2. Copy this entire file content
+3. Paste in index.html before </body>
+-->
+
+<!-- Chatbot Styles -->
+<style>
+    /* Chatbot Button */
+    .chatbot-button {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+        animation: pulse 2s infinite;
+        overflow: hidden;
+        padding: 0;
+    }
+
+    .chatbot-button img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .chatbot-button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 25px rgba(102, 126, 234, 0.7);
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    /* Chatbot Window */
+    .chatbot-window {
+        position: fixed;
+        bottom: 120px;
+        right: 30px;
+        width: 400px;
+        height: 600px;
+        background: var(--bg-white);
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        z-index: 10001;
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        animation: slideUp 0.3s ease-out;
+    }
+
+    .chatbot-window.active {
+        display: flex;
+    }
+
+    @keyframes slideUp {
+        from { 
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        to { 
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Chatbot Header */
+    .chatbot-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .chatbot-avatar {
+        width: 50px;
+        height: 50px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .chatbot-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .chatbot-info h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+
+    .chatbot-info p {
+        margin: 5px 0 0 0;
+        font-size: 0.85rem;
+        opacity: 0.9;
+    }
+
+    .chatbot-close {
+        margin-left: auto;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 5px;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        transition: all 0.3s;
+    }
+
+    .chatbot-close:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Chatbot Messages */
+    .chatbot-messages {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background: var(--bg-light);
+    }
+
+    .chatbot-message {
+        margin-bottom: 15px;
+        animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message-bot {
+        display: flex;
+        gap: 10px;
+    }
+
+    .message-user {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .message-bubble {
+        max-width: 75%;
+        padding: 12px 16px;
+        border-radius: 16px;
+        font-size: 0.95rem;
+        line-height: 1.4;
+    }
+
+    .message-bot .message-bubble {
+        background: white;
+        color: var(--text-dark);
+        border-bottom-left-radius: 4px;
+    }
+
+    .message-user .message-bubble {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+
+    .message-avatar {
+        width: 35px;
+        height: 35px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+
+    .message-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Quick Replies */
+    .chatbot-quick-replies {
+        padding: 15px 20px;
+        background: var(--bg-white);
+        border-top: 1px solid var(--border);
+    }
+
+    .quick-reply-title {
+        font-size: 0.85rem;
+        color: var(--text-gray);
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    .quick-reply-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .quick-reply-btn {
+        padding: 8px 16px;
+        background: var(--bg-light);
+        border: 2px solid var(--border);
+        border-radius: 20px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        color: var(--text-dark);
+        font-weight: 600;
+    }
+
+    .quick-reply-btn:hover {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-color: #667eea;
+        transform: translateY(-2px);
+    }
+
+    /* Typing Indicator */
+    .typing-indicator {
+        display: none;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        background: white;
+        border-radius: 16px;
+        width: fit-content;
+        margin-bottom: 15px;
+    }
+
+    .typing-indicator.active {
+        display: flex;
+    }
+
+    .typing-dot {
+        width: 8px;
+        height: 8px;
+        background: #667eea;
+        border-radius: 50%;
+        animation: typing 1.4s infinite;
+    }
+
+    .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    @keyframes typing {
+        0%, 60%, 100% { transform: translateY(0); }
+        30% { transform: translateY(-10px); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .chatbot-window {
+            width: calc(100% - 40px);
+            height: calc(100% - 160px);
+            right: 20px;
+            bottom: 110px;
+        }
+
+        .chatbot-button {
+            width: 60px;
+            height: 60px;
+            right: 20px;
+            bottom: 20px;
+        }
+    }
+</style>
+
+<!-- Chatbot HTML -->
+<button class="chatbot-button" onclick="toggleChatbot()" id="chatbotBtn">
+    <img src="khushi.png" alt="Khushi">
+</button>
+
+<div class="chatbot-window" id="chatbotWindow">
+    <div class="chatbot-header">
+        <div class="chatbot-avatar">
+            <img src="khushi.png" alt="Khushi">
+        </div>
+        <div class="chatbot-info">
+            <h3>Khushi</h3>
+            <p>DMRC Virtual Assistant</p>
+        </div>
+        <button class="chatbot-close" onclick="toggleChatbot()">×</button>
+    </div>
+
+    <div class="chatbot-messages" id="chatMessages">
+        <!-- Messages will appear here -->
+    </div>
+
+    <div class="chatbot-quick-replies">
+        <div class="quick-reply-title">Choose a question:</div>
+        <div class="quick-reply-buttons">
+            <button class="quick-reply-btn" onclick="askQuestion('hours')">🕒 Operating Hours</button>
+            <button class="quick-reply-btn" onclick="askQuestion('fare')">💰 Fare Info</button>
+            <button class="quick-reply-btn" onclick="askQuestion('recharge')">💳 Recharge Wallet</button>
+            <button class="quick-reply-btn" onclick="askQuestion('ticket')">🎫 Book Ticket</button>
+            <button class="quick-reply-btn" onclick="askQuestion('refund')">💸 Refund Policy</button>
+            <button class="quick-reply-btn" onclick="askQuestion('contact')">📞 Contact Support</button>
+            <button class="quick-reply-btn" onclick="askQuestion('validity')">⏰ Ticket Validity</button>
+            <button class="quick-reply-btn" onclick="askQuestion('stations')">🚇 Total Stations</button>
+        </div>
+    </div>
+</div>
+
+<!-- Chatbot Script -->
+<script>
+    // FAQ Database
+    const khushiFAQs = {
+        hours: {
+            question: "What are the operating hours?",
+            answer: "Delhi Metro operates from 6:00 AM to 11:00 PM on all days. First train starts at 6:00 AM and last train departs by 11:00 PM. 🚇"
+        },
+        fare: {
+            question: "How is the fare calculated?",
+            answer: "Fare is calculated based on the number of stations traveled:\n\n• 1-2 stations: ₹10\n• 3-4 stations: ₹20\n• 5-12 stations: ₹30\n• 13-21 stations: ₹40\n• 22+ stations: ₹50\n\nMaximum fare is ₹50. 💰"
+        },
+        recharge: {
+            question: "How to recharge wallet?",
+            answer: "To recharge your wallet:\n\n1. Login to your account\n2. Go to 'Book Ticket' tab\n3. Click on 'Recharge Wallet' button\n4. Choose amount (₹100-₹5000) or enter custom\n5. Click 'Recharge Now'\n\nMinimum recharge: ₹100 💳"
+        },
+        ticket: {
+            question: "How to book a ticket?",
+            answer: "Booking a ticket is easy:\n\n1. Login to your account\n2. Select 'From' station\n3. Select 'To' station\n4. Click 'Find Route & Fare'\n5. Choose your preferred route\n6. Click 'Confirm & Pay'\n\nDone! Your ticket is ready! 🎫"
+        },
+        refund: {
+            question: "What is the refund policy?",
+            answer: "Refund Policy:\n\n• Active tickets: Full refund (₹5 cancellation fee)\n• Used tickets: No refund\n• Expired tickets: No refund\n\nTo cancel: Go to History → Select ticket → Cancel\n\nRefund credited to wallet instantly! 💸"
+        },
+        contact: {
+            question: "How to contact support?",
+            answer: "Contact DMRC Support:\n\n📞 Helpline: 155370\n📧 Email: customercare@dmrc.org\n⏰ Available: 24/7\n\nFor emergencies, contact station staff immediately! 🆘"
+        },
+        validity: {
+            question: "How long is a ticket valid?",
+            answer: "Ticket validity depends on journey:\n\n• Short journey (1-12 stations): 1 hour\n• Medium journey (13-21 stations): 2 hours\n• Long journey (22+ stations): 3 hours\n\nFrom time of booking. Use before expiry! ⏰"
+        },
+        stations: {
+            question: "How many stations are there?",
+            answer: "Delhi Metro Network:\n\n🚇 Total Stations: 286\n🎨 Lines: 12 (Red, Blue, Yellow, Green, Violet, Pink, Magenta, Orange, Grey, Rapid Metro, Airport Express, Aqua)\n📏 Total Length: 391 km\n\nOne of the largest metro networks in the world! 🌟"
+        }
+    };
+
+    let chatMessages = [];
+    let isChatbotOpen = false;
+
+    // Initialize chatbot
+    function initChatbot() {
+        // Welcome message
+        addBotMessage("Namaste! 🙏 I'm Khushi, your DMRC virtual assistant. How can I help you today?");
+    }
+
+    // Toggle chatbot
+    function toggleChatbot() {
+        isChatbotOpen = !isChatbotOpen;
+        const window = document.getElementById('chatbotWindow');
+        
+        if (isChatbotOpen) {
+            window.classList.add('active');
+            if (chatMessages.length === 0) {
+                initChatbot();
+            }
+        } else {
+            window.classList.remove('active');
+        }
+    }
+
+    // Add bot message
+    function addBotMessage(text) {
+        const messagesDiv = document.getElementById('chatMessages');
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'chatbot-message message-bot';
+        
+        messageDiv.innerHTML = `
+            <div class="message-avatar">
+                <img src="khushi.png" alt="Khushi">
+            </div>
+            <div class="message-bubble">${text.replace(/\n/g, '<br>')}</div>
+        `;
+        
+        messagesDiv.appendChild(messageDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        
+        chatMessages.push({ type: 'bot', text });
+    }
+
+    // Add user message
+    function addUserMessage(text) {
+        const messagesDiv = document.getElementById('chatMessages');
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'chatbot-message message-user';
+        
+        messageDiv.innerHTML = `
+            <div class="message-bubble">${text}</div>
+        `;
+        
+        messagesDiv.appendChild(messageDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        
+        chatMessages.push({ type: 'user', text });
+    }
+
+    // Show typing indicator
+    function showTyping() {
+        const messagesDiv = document.getElementById('chatMessages');
+        
+        const typingDiv = document.createElement('div');
+        typingDiv.id = 'typingIndicator';
+        typingDiv.className = 'chatbot-message message-bot';
+        typingDiv.innerHTML = `
+            <div class="message-avatar">
+                <img src="khushi.png" alt="Khushi">
+            </div>
+            <div class="typing-indicator active">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        `;
+        
+        messagesDiv.appendChild(typingDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    // Hide typing indicator
+    function hideTyping() {
+        const typingDiv = document.getElementById('typingIndicator');
+        if (typingDiv) {
+            typingDiv.remove();
+        }
+    }
+
+    // Ask question
+    function askQuestion(topic) {
+        const faq = khushiFAQs[topic];
+        
+        if (!faq) return;
+        
+        // Add user message
+        addUserMessage(faq.question);
+        
+        // Show typing
+        showTyping();
+        
+        // Simulate thinking delay
+        setTimeout(() => {
+            hideTyping();
+            addBotMessage(faq.answer);
+            
+            // Add follow-up
+            setTimeout(() => {
+                addBotMessage("Is there anything else I can help you with? 😊");
+            }, 500);
+        }, 1000);
+    }
+</script>
